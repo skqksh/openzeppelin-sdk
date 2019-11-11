@@ -18,7 +18,7 @@ log "Building CLI docs..."
 # [TODO] run this only if dependencies aren't installed yet
 cd ../..
 shopt -s globstar && rm -rf **/node_modules/websocket/.git
-npm ci
+yarn
 npx lerna bootstrap
 cd packages/cli
 
