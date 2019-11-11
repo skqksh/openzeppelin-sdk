@@ -6,6 +6,8 @@ log() {
   echo "$*" >&2
 }
 
+yarn
+
 # lib
 log "Building lib docs..."
 solidity-docgen -i ../lib/contracts/ -o modules/api/pages -e ../lib/contracts/mocks -x adoc -t templates
