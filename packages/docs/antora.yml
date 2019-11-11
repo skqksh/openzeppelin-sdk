@@ -1,6 +1,6 @@
 name: 'sdk'
 title: 'SDK'
-version: '2.5'
+version: '2.6'
 nav: 
   - modules/ROOT/nav.adoc
   - modules/api/nav.adoc
