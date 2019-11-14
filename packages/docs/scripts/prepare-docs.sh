@@ -7,7 +7,7 @@ log() {
 }
 
 log "Installing dependencies..."
-yarn --cwd ../.. > /dev/null
+npx yarn --cwd ../.. > /dev/null
 log "Done"
 
 # lib
@@ -19,5 +19,5 @@ log "Done"
 # cli
 log "Building CLI docs..."
 
-yarn --cwd ../cli gen-docs
+npx yarn --cwd ../cli gen-docs
 log "Done"
