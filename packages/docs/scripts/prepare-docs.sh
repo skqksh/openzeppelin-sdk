@@ -22,7 +22,7 @@ log "Done"
 # cli
 log "Building CLI docs..."
 
-cd ../packages/cli
+cd ../cli
 
 npm run gen-docs
 log "Done"
