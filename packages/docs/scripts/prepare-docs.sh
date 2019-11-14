@@ -6,7 +6,7 @@ log() {
   echo "$*" >&2
 }
 
-yarn
+yarn --silent
 
 # lib
 log "Building lib docs..."
