@@ -9,8 +9,8 @@ log() {
 # [TODO] run this only if dependencies aren't installed yet
 cd ../..
 shopt -s globstar && rm -rf **/node_modules/websocket/.git
-npm ci
-npx lerna bootstrap
+npm ci > /dev/null
+npx lerna bootstrap > /dev/null
 cd packages/docs
 
 # lib
