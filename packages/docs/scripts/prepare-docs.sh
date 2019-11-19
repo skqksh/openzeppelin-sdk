@@ -6,6 +6,10 @@ log() {
   echo "$*" >&2
 }
 
+log "Which yarn: $(which yarn)"
+
+log "Yarn config: $(yarn config current)"
+
 log "Installing dependencies..."
 npx yarn --cwd ../.. > /dev/null
 log "Done"
