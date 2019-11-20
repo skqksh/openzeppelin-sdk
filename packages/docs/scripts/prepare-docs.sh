@@ -6,14 +6,8 @@ log() {
   echo "$*" >&2
 }
 
-log "Which yarn: $(which yarn)"
-
-log "Yarn config current: $(yarn config current)"
-
-log "Yarn config list: $(yarn config list)"
-
 log "Installing dependencies..."
-npx yarn --cwd ../.. > /dev/null
+npx yarn --cwd ../..
 log "Done"
 
 # lib
@@ -24,6 +18,5 @@ log "Done"
 
 # cli
 log "Building CLI docs..."
-
 npx yarn --cwd ../cli gen-docs
 log "Done"
