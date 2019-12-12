@@ -6,9 +6,9 @@ log() {
   echo "$*" >&2
 }
 
-log "Installing dependencies..."
-npx yarn --cwd ../..
-log "Done"
+if [ ! -d node_modules ]; then
+  yarn --cwd ../..
+fi
 
 # lib
 log "Building lib docs..."
@@ -18,5 +18,5 @@ log "Done"
 
 # cli
 log "Building CLI docs..."
-npx yarn --cwd ../cli gen-docs
+yarn --cwd ../cli gen-docs
 log "Done"

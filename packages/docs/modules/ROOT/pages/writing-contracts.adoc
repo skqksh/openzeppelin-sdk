@@ -124,7 +124,7 @@ contract MyContract {
 }
 ----
 
-This is equivalent to setting these values in the constructor, and as such, will not work for upgradeable contracts. Make sure that all initial values are set in an initializer function as shown above; otherwise, any upgradeable instances will not have these fields set.
+This is equivalent to setting these values in the constructor, and as such, will not work for upgradeable contracts. Make sure that all initial values are set in an initializer function as shown below; otherwise, any upgradeable instances will not have these fields set.
 
 [source,solidity]
 ----
@@ -189,7 +189,7 @@ $ TOKEN=$(openzeppelin create TokenContract)
 $ openzeppelin create MyContract --init --args $TOKEN
 ----
 
-An advanced alternative, if you need to create upgradeable contracts on the fly, is to keep an instance of your OpenZeppelin SDK `App` in your contracts. The xref:api::lib.adoc#App[`App`] is a contract that acts as the entrypoint for your OpenZeppelin SDK project, which has references to your logic implementations, and can create new contract instances:
+An advanced alternative, if you need to create upgradeable contracts on the fly, is to keep an instance of your OpenZeppelin SDK `App` in your contracts. The xref:api::upgrades.adoc#App[`App`] is a contract that acts as the entrypoint for your OpenZeppelin SDK project, which has references to your logic implementations, and can create new contract instances:
 
 [source,solidity]
 ----

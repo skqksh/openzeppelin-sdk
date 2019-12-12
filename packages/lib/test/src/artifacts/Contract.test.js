@@ -1,17 +1,19 @@
 'use strict';
 require('../../setup');
 
-import utils from 'web3-utils';
+import { accounts, defaultSender } from '@openzeppelin/test-environment';
 
 import Contracts from '../../../src/artifacts/Contracts';
 import { contractMethodsFromAbi, ContractMethodMutability as Mutability } from '../../../src/artifacts/Contract';
+
+import { expect } from 'chai';
 
 const ContractWithStructInConstructor = Contracts.getFromLocal('WithStructInConstructor');
 const ContractWithConstructorImplementation = Contracts.getFromLocal('WithConstructorImplementation');
 const InitializableMock = Contracts.getFromLocal('InitializableMock');
 
-contract('Contract', function(accounts) {
-  const [_, account] = accounts.map(utils.toChecksumAddress);
+describe('Contract', function() {
+  const [account] = accounts;
   const txParams = { from: account };
 
   describe('methods', function() {
@@ -30,7 +32,7 @@ contract('Contract', function(accounts) {
             (await instance.methods.buz().call()).should.not.be.null;
             (await instance.methods.foo().call()).should.not.be.null;
             (await instance.methods.bar().call()).should.not.be.null;
-            (await instance.methods.sender().call()).should.eq(_);
+            (await instance.methods.sender().call()).should.eq(defaultSender);
           });
         });
 
@@ -87,9 +89,7 @@ contract('Contract', function(accounts) {
         it('returns methods without initializers', function() {
           const methods = this.methods.filter(({ hasInitializer }) => !hasInitializer);
           expect(methods).to.have.lengthOf(3);
-          expect(methods[0].name).to.eq('x');
-          expect(methods[1].name).to.eq('initializerRan');
-          expect(methods[2].name).to.eq('fail');
+          expect(methods.map(m => m.name)).to.have.members(['x', 'initializerRan', 'fail']);
         });
 
         it('sets selectors', function() {
@@ -112,9 +112,7 @@ contract('Contract', function(accounts) {
         it('returns methods with initializers', function() {
           const methods = this.methods.filter(({ hasInitializer }) => hasInitializer);
           expect(methods).to.have.lengthOf(3);
-          expect(methods[0].name).to.eq('initialize');
-          expect(methods[1].name).to.eq('initializeNested');
-          expect(methods[2].name).to.eq('initializeWithX');
+          expect(methods.map(m => m.name)).to.have.members(['initialize', 'initializeNested', 'initializeWithX']);
         });
 
         it('returns an array of methods', function() {
@@ -123,10 +121,12 @@ contract('Contract', function(accounts) {
         });
 
         it('sets selectors', function() {
-          expect(this.methods[0].selector).to.eq('initialize()');
-          expect(this.methods[1].selector).to.eq('initializeNested()');
-          expect(this.methods[2].selector).to.eq('initializeWithX(uint256)');
-          expect(this.methods[3].selector).to.eq('nonInitializable(uint256)');
+          expect(this.methods.map(m => m.selector)).to.have.members([
+            'initialize()',
+            'initializeNested()',
+            'initializeWithX(uint256)',
+            'nonInitializable(uint256)',
+          ]);
         });
       });
     });
