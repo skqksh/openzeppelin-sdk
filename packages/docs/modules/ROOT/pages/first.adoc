@@ -1,7 +1,7 @@
 [[your-first-project]]
-= Your first project
+= 나의 첫 프로젝트
 
-This tutorial will get you started using the OpenZeppelin SDK. We will create a new project with a simple contract, deploy it to a development network, interact with it from the terminal, and then upgrade it.
+이 튜토리얼을 통해 OpenZeppelin SDK 사용법을 배웁니다. 간단한 컨트랙트를 포함한 새 프로젝트를 만들고, 개발 네트워크에 한 후, 터미널을 이용해 프로젝트와 상호 작용 해 보고, 컨트랙트를 업그레이드 해 볼것입니다.
 
 [[prerequisites]]
 == Prerequisites
