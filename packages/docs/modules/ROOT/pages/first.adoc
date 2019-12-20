@@ -4,23 +4,23 @@
 이 튜토리얼을 통해 OpenZeppelin SDK 사용법을 배웁니다. 간단한 컨트랙트를 포함한 새 프로젝트를 만들고, 개발 네트워크에 한 후, 터미널을 이용해 프로젝트와 상호 작용 해 보고, 컨트랙트를 업그레이드 해 볼것입니다.
 
 [[prerequisites]]
-== Prerequisites
+== 준비
 
-The OpenZeppelin SDK is bundled as an https://npmjs.com/package/@openzeppelin/cli[npm package]. We will need https://nodejs.org/[node.js] to install and run it. Head over to https://nodejs.org/[its website] for instructions on how to install it.
+OpenZeppelin SDK 는 https://npmjs.com/package/@openzeppelin/cli[npm package]로 빌드되었습니다. 설치 및 실행을 위해https://nodejs.org/[node.js]가 필요합니다. 설치 방법에 대한 지침은 https://nodejs.org/[its website]를 참고 해 주세요.
 
-Once you have installed `node`, you can install the OpenZeppelin SDK CLI:
+`node`를 설치하면, OpenZeppelin SDK CLI를 설치할 수 있습니다:
 
 [source,console]
 ----
 npm install --global @openzeppelin/cli
 ----
 
-NOTE: We are installing the CLI https://docs.npmjs.com/downloading-and-installing-packages-globally[globally] in our workstation. Alternatively, you can install it https://docs.npmjs.com/downloading-and-installing-packages-locally[local] to each project by running `npm install --save-dev @openzeppelin/cli` in your project folder. This would require you to run every command by prefixing it with `npx`. Installing it locally allows you to have different `openzeppelin` versions in different projects, but requires you to reinstall every time you start a new project.
+NOTE: CLI 는 https://docs.npmjs.com/downloading-and-installing-packages-globally[global] 로 설치 할 것입니다. 또는, 프로젝트별로 `npm install --save-dev @openzeppelin/cli` 명령어를 이용하여 https://docs.npmjs.com/downloading-and-installing-packages-locally[local] 로 설치할 수 도 있습니다. 이 경우에는 매번 명령어 접두어로 `npx`를 붙여야 합니다. local 로 설치하는것은, 프로젝트별로 다른 버전의 `openzeppelin` 을 사용할 수 있지만, 새 프로젝트를 시작할때마다 재설치 해야 합니다.
 
 [[setting-up-your-project]]
-== Setting up your project
+== 프로젝트 설정
 
-We'll first create a node.js project in a new directory. Head over to a terminal and run:
+먼저 새 디렉토리에 node.js 프로젝트를 만듭니다. 터미널로 가서 다음을 실행하세요:
 
 [source,console]
 ----
@@ -29,25 +29,25 @@ cd my-project
 npm init -y
 ----
 
-Let's now use the CLI to initialize a OpenZeppelin SDK project:
+이제 CLI를 사용하여 OpenZeppelin SDK 프로젝트를 초기화하겠습니다:
 
 [source,console]
 ----
 openzeppelin init
 ----
 
-The CLI will prompt you to choose a project name and version, defaulting to the ones from the `package.json`, and then set up a few files and folders for running your OpenZeppelin project.
+CLI를 이용하여 프로젝트 이름과 버전을 설정하고, package.json에서 기본값을 선택한 다음, OpenZeppelin 프로젝트를 실행할 파일과 폴더를 설정하라는 메시지를 표시합니다.
 
-NOTE: `oz` is an alias for `openzeppelin` e.g. instead of `openzeppelin init` you can just use `oz init`.
+NOTE: `openzeppelin`의 알리아스는 `oz`입니다. 예시) `openzeppelin init` 대신 `oz init`로 입력해도 결과는 동일합니다.
 
-We are now ready to begin coding.
+이제 코딩할 준비가 완료되었습니다.
 
-NOTE: Should you get lost at any point during this tutorial, you can refer to the full code for this project in our https://github.com/OpenZeppelin/openzeppelin-sdk/tree/v2.4.0/examples/first-project[`Github repo`].
+NOTE: 튜토리얼간 길을잃을경우, https://github.com/OpenZeppelin/openzeppelin-sdk/tree/v2.4.0/examples/first-project[`Github repo`]에서 모든 소스코드를 참고할 수 있습니다.
 
 [[your-first-contract]]
-== Your first contract
+== 나의 첫 컨트랙트
 
-We will write a simple contract in https://solidity.readthedocs.io/[Solidity], the most popular language for Ethereum smart contracts. Create a new file `contracts/Counter.sol` in your project with the following content:
+이더리움 스마트 컨트랙트에 가장 널리 사용되는 언어인 https://solidity.readthedocs.io/[Solidity]로 간단한 컨트랙트를 작성해 보겠습니다. 프로젝트에 새로운 파일 `contracts/Counter.sol`을 생성 후 다음 내용을 작성 해 주세요:
 
 [source,solidity]
 ----
@@ -62,27 +62,27 @@ contract Counter {
 }
 ----
 
-This contract will just keep a numeric `value`, that will be increased by one every time we send a transaction to the `increase()` function.
+이 컨트렉트는 단순한 숫자인 `value`를 가지며, `increase()` 함수로 트랜잭션을 보낼때마다 값을 1 증가 시킵니다.
 
-You can run `openzeppelin compile` to compile the contract and check for any errors. After it compiled successfully, we can now deploy our contract.
+터미널에서 명령어 `openzeppelin compile`을 실행하여 컨트랙트를 컴파일 하고 에러가 나오는지 확인해 보세요. 성공적으로 컴파일 된 후 컨트랙트를 배포할 수 있게 됩니다.
 
-NOTE: You don't have to worry if you forget to compile your contract. The CLI will automatically check if your contract changed when you run any command, and compile it if needed.
+NOTE: 컨트랙트 컴파일을 잊었다고 해서 걱정할 필요 없습니다. CLI는 명령을 실행할 때 계약이 변경되었는지 자동으로 확인하고, 필요한 경우 컴파일합니다.
 
 [[deploying-to-a-development-network]]
-== Deploying to a development network
+== 개발 네트워크에 배포
 
-We will use https://truffleframework.com/ganache[ganache] as a _development network_ to deploy our contract. If you don't have ganache installed, do so now by running `npm install -g ganache-cli`.
+_development network_ 로써 https://truffleframework.com/ganache[ganache] 를 이용하여 컨트랙트를 배포해 보겠습니다. 가나슈가 설치되어 있지 않은 경우, 바로 `npm install -g ganache-cli`를 실행하여 설치 해 주세요.
 
-Development networks are mini blockchains that run just on your computer, and are much faster than the actual Ethereum network. We will use one for coding and testing.
+개발 네트워크는 컴퓨터에서만 실행되는 미니 블록 체인으로 실제 이더리움 네트워크보다 훨씬 빠릅니다. 코딩 및 테스트용으로 사용할 것 입니다.
 
-Open a separate terminal, and start a new ganache process:
+새로운 터미널을 열고, 가나슈 프로세스를 시작 해 주세요:
 
 [source,console]
 ----
 ganache-cli --deterministic
 ----
 
-This will start a new development network, using a deterministic set of accounts, instead of random ones. We can now deploy our contract there, running `openzeppelin create`, and choosing to deploy the `Counter` contract to the `development` network.
+임의의 계정 대신, 결정적인 계정 세트를 사용하여 새로운 개발 네트워크를 시작합니다. 이제 `openzeppelin create`를 실행하여 `Counter` 컨트랙트를 개발 네트워크에 배포하도록 선택할 수 있습니다.
 
 [source,console]
 ----
@@ -97,9 +97,9 @@ $ openzeppelin create
 ✓ Instance created at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 ----
 
-NOTE: The addresses where your contracts are created, or the transaction identifiers you see, may differ from the ones listed here.
+NOTE: 컨트랙트가 생성될때 보이는 어드레스들이나 트랜잭션 식별자 들은, 여기 있는 값 과 다를 수 있습니다.
 
-Our counter contract is deployed to the local development network and ready to go! We can test it out by interacting with it from the terminal. Let's try incrementing the counter, by sending a transaction to call the `increase` function through `openzeppelin send-tx`.
+카운터 컨트랙트는 로컬 개발 네트워크에 배포되었으며 실행할 준비가 되었습니다! 터미널에서 상호 작용하여 테스트 할 수 있습니다. `openzeppelin send-tx`를 실행하여 `increase` 함수를 호출하는 트랜잭션을 보내, 값을 증가시켜 보세요.
 
 [source,console]
 ----
@@ -110,7 +110,7 @@ $ openzeppelin send-tx
 ✓ Transaction successful. Transaction hash: 0x20bef6583ea32cc57fe179e34dd57a5494db3c403e441624e56a886898cb52bd
 ----
 
-We can now use `openzeppelin call` to query the contract's public `value`, and check that it was indeed increased from zero to one.
+컨트랙트의 퍼블릭값인 `value`를 확인하기 위해 `openzeppelin call`을 실행 후, 값이 0 에서 1 로 증가한 것을 확인 해 주세요.
 
 [source,console]
 ----
@@ -122,9 +122,9 @@ $ openzeppelin call
 ----
 
 [[upgrading-your-contract]]
-== Upgrading your contract
+== 컨트랙트 업그레이드
 
-We will now modify our `Counter` contract to make the `increase` function more interesting. Instead of increasing the counter by one, we will allow the caller to increase the counter by any value. Let's modify the code in `contracts/Counter.sol` to the following:
+우리는 이제 `Counter` 컨트랙트의 `increase` 함수를 조금 더 흥미롭게 바꿔보려 합니다. 값을 1 증가 하는것 대신에, 요청자가 원하는만큼의 값을 증가 할 수 있도록 하려고 합니다. `contracts/Counter.sol`를 다음과 같이 변경 해 주세요:
 
 [source,solidity]
 ----
@@ -139,7 +139,7 @@ contract Counter {
 }
 ----
 
-We can now upgrade the instance we created earlier to this new version:
+이제 이전에 만든 인스턴스를이 새 버전으로 업그레이드 할 수 있습니다:
 
 [source,console]
 ----
@@ -151,7 +151,7 @@ $ openzeppelin upgrade
 Instance upgraded at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601.
 ----
 
-Done! Our `Counter` instance has been upgraded to the latest version, and neither its address nor its state have changed. Let's check it out by increasing the counter by ten, which should yield eleven, since we had already increased it by one:
+끝! 카운터 인스턴스가 최신 버전으로 업그레이드되었으며 주소 나 상태가 변경되지 않았습니다. 값을 10 늘려서 확인해 봅시다. 이미 1 늘렸기 때문에 11 이 나옵니다:
 
 [source,console]
 ----
@@ -169,6 +169,6 @@ $ openzeppelin call
 Returned "11"
 ----
 
-NOTE: If you are curious about how the OpenZeppelin SDK achieves this feat, given that smart contracts are immutable, check out our xref:pattern.adoc[upgrades pattern guide]. You will see that there are some changes that are not supported during upgrades. For instance, you cannot xref:writing-contracts.adoc#modifying-your-contracts[remove or change the type of a contract state variable]. Nevertheless, you can change, add, or remove all the functions you want.
+NOTE: 스마트컨트랙트가 변경 불가함에도 불구하고, OpenZeppelin SDK 이 어떻게 이러한 업적을 달성했는지 궁금하다면, xref:pattern.adoc[upgrades pattern guide]를 확인 해 주세요. 업그레이드를 지원하지 않는 변경사항이 있습니다. 예를 들어, 계약 상태 변수의 유형을 xref:writing-contracts.adoc#modifying-your-contracts[제거하거나 변경] 할 수 없습니다. 그럼에도 불구하고, 원하는 모든 함수를 변경, 추가 또는 제거 할 수 있습니다.
 
-That's it! You now know how to start a simple OpenZeppelin project, create a contract, deploy it to a local network, and even upgrade it as you develop. Head over to the next tutorial to learn how to interact with your contract from your code.
+그게 다에요! 이제 간단한 OpenZeppelin 프로젝트를 시작하고, 계약을 작성하고, 로컬 네트워크에 배포하고, 개발할 때 업그레이드하는 방법을 알게되었습니다. 다음 자습서로 이동하여 코드에서 컨트렉트와 상호 작용하는 방법을 알아보세요.
