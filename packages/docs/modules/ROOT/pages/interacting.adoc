@@ -1,30 +1,30 @@
 [[interacting-with-your-contracts]]
-= Interacting with your contracts
+= 컨트랙트와 상호작용하기
 
-This tutorial xref:first.adoc[builds on the previous one] where we created a new OpenZeppelin project, and created (and upgraded!) a simple `Counter` contract in a local development network. We will now see how to interact with this contract from javascript code using https://web3js.readthedocs.io/en/1.0/[web3.js]. We will build a small script that will increase the counter and report back the updated value.
+이 튜토리얼은, 이전에 우리가 로컬 개발 네트워크에 생성하고 만든(업그레이드까지 한!) 간단한 'Counter' 컨트랙트를 기반으로 합니다. 이제  https://web3js.readthedocs.io/en/1.0/[web3.js]를 사용하여 자바 스크립트 코드에서이 계약과 상호 작용하는 방법을 살펴 보겠습니다. 작은 스크립트를 작성하여, 카운터값을 증가 시킨 후 업데이트된 결과값을 보고받아 보겠습니다.
 
-The full code for this tutorial can be found in the https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.4.0/examples/first-project/src/index.js[`first-project` example] in the OpenZeppelin SDK github repository.
+이 튜토리얼의 전체 코드는 OpenZeppelin SDK github 저장소의 https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.4.0/examples/first-project/src/index.js[`첫 번째 프로젝트` 예제]에서 찾을 수 있습니다.
 
 [[setup]]
 == Setup
 
-We will be using https://web3js.readthedocs.io/en/1.0/[web3.js] to interact with the blockchain from our code, which is the same library that OpenZeppelin SDK uses under the hood. In the `my-project` project folder we created earlier, run the following to install it:
+OpenZeppelin SDK가 사용하는 라이브러리와 동일한 라이브러리 인 https://web3js.readthedocs.io/en/1.0/[web3.js]를 사용하여 코드에서 블록 체인과 상호 작용할 것입니다. 이미 만든 `my-project`에서 다음을 실행하여 설치 해 주세요.
 
 [source,console]
 ----
 npm install web3
 ----
 
-Keep in mind that there are many other javascript libraries available, and you can use whichever you like the most. Once a contract is deployed, you can interact with it through any library!
+다양하고 많은 자바스크립트가 있으며,, 가장 좋아하는 것을 사용할 수 있습니다. 컨트랙트가 배포되면 어떤 라이브러리를 통해서도 계약과 상호 작용할 수 있습니다!
 
 [[connecting-to-the-network]]
-== Connecting to the network
+== 네트워크에 연결
 
-Our first step will be to open a connection to the network. We will connect to the local development network we started on the previous tutorial.
+첫 번째 단계는 네트워크 연결을 여는 것입니다. 이전 튜토리얼에서 시작한 로컬 개발 네트워크에 연결합니다.
 
-CAUTION: By default, `ganache-cli` deletes all data when you stop it. If you stopped the ganache process from the previous tutorial, you will need to start a new one with `ganache-cli --deterministic`, and run `openzeppelin create Counter` again.
+주의: 기본적으로, `ganache-cli`는 중지되면 모든 데이터를 제거합니다. 이전 튜토리얼에서 가나슈를 종료 했다면,  `ganache-cli --deterministic`를 실행하여 새로 시작후, `openzeppelin create Counter`를 다시 실행 해 주세요.
 
-Let's begin coding in a new `src/index.js` file, where we will be writing our javascript script. We will start with some boilerplate for writing async code, and setting up a new `web3` object.
+자바스크립트는 새 파일 `src/index.js`에서 코딩을 시작해 보겠습니다. 비동기코드를 작성하기위한 보일러플레이트를 이용하고, `web3` 객체를 설정 해 보겠습니다.
 
 [source,js]
 ----
@@ -38,7 +38,7 @@ async function main() {
 main();
 ----
 
-Here, we are initializing a new `web3` instance connecting to the local development network, that is running on localhost port 8545. We can test if the connection works by asking something to the local node, such as the list of enabled accounts:
+이제 로컬 호스트 포트 8545인 개발 네트워크에 연결하는, 새 `web3` 인스턴스를 초기화하고 있습니다. 활성화 된 계정 목록과 같은 로컬 노드에 무언가를 요청하여 연결이 작동하는지 테스트 할 수 있습니다.
 
 [source,js]
 ----
@@ -50,9 +50,9 @@ const accounts = await web3.eth.getAccounts();
 console.log(accounts);
 ----
 
-NOTE: We will not be repeating the boilerplate code on every snippet, but make sure to always code _inside_ the `main` function we defined above!
+NOTE: 모든 스니펫에서 상용구 코드를 반복하지는 않지만 항상 위에서 정의한 `main` 함수 내에서 코딩해야합니다.
 
-Run the code above using `node`, and check that you are getting a list of available accounts in response. 
+`node`를 사용하여 위의 코드를 실행하고 사용 가능한 계정 목록이 있는지 확인하십시오.
 
 [source,console]
 ----
@@ -69,7 +69,7 @@ $ node src/index.js
   '0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e' ]
 ----
 
-The accounts should match the ones you get when you run `openzeppelin accounts`.
+계정은 `openzeppelin 계정`을 실행할 때 얻은 계정과 일치해야합니다.
 
 [source,console]
 ----
@@ -90,19 +90,19 @@ All:
 - 9: 0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e
 ----
 
-Great! We have our first code snippet getting data out of a blockchain. Let's start working with our contract now.
+훌륭합니다! 첫 번째 코드 스니펫이 블록 체인에서 데이터를 가져옵니다. 이제 우리가 만든 컨트랙트를 이용해 보겠습니다.
 
 [[getting-a-contract-instance]]
-== Getting a contract instance
+== 컨트랙트 인스턴스 얻기
 
-In order to interact with our deployed `Counter` contract, we will create a new https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html[web3 contract instance]. This is a javascript object that represents our contract in the blockchain.
+우리가 배포한 `Counter` 컨트랙트와 상호작용하기 위해, https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html[web3 컨트랙트 인스턴스]를 새로 만들어 보겠습니다. 이것은 블록체인에 있는 우리의 컨트랙트를 나타내는 자바스크립트 객체 입니다.
 
-To create this web3 contract, we need two things:
+이 web3 컨트랙트를 만들기 위해서 두가지가 필요합니다.
 
-* The address where it is deployed
-* The ABI of the contract, which is the definition of the contract's public functions
+* 컨트랙트가 배포된 주소(address)
+* 컨트랙트의 함수를 정의한 ABI
 
-The address was returned by the OpenZeppelin CLI when we deployed the contract. As for the ABI, we can retrieve it from the compiled artifact in the `build/contracts` folder as shown below.
+address 는 OpenZeppelin CLI가 컨트랙트를 배포할때 표시됩니다. ABI는 아래와 같이 `build/contracts` 폴더의 컴파일 된 아티팩트에서 검색 할 수 있습니다.
 
 [source,js]
 ----
@@ -115,14 +115,14 @@ const abi = require('../build/contracts/Counter.json').abi;
 const counter = new web3.eth.Contract(abi, address);
 ----
 
-NOTE: Make sure to replace the `address` with the one you got when deploying the contract, which may be different to the one shown here.
+NOTE: `address`는 본인이 컨트랙트를 배포할때 받은 것으로 대체 하세요, 아마 여기 나와있는것과 다를 것 입니다.
 
-We can now use this javascript object to interact with our contract. Let's see how!
+이제 이 자바 스크립트 객체를 사용하여 컨트랙트와 상호 작용할 수 있습니다. 어떻게 하는지 보겠습니다!
 
 [[calling-the-contract]]
-== Calling the contract
+== 컨트랙트 호출하기
 
-Let's start by displaying the current value of the `Counter` contract. We will need to https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#methods-mymethod-call[call] into the `value()` public method of the contract, and https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await[await] the response:
+`Counter` 컨트랙트의 현재 value 를 표시하는것 부터 해 보겠습니다. 컨트랙트 안에 있는 퍼블릭 함수`value()`를 https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#methods-mymethod-call[호출(call)]한뒤, 응답을 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await[기다려야(await)] 합니다.
 
 [source,js]
 ----
@@ -131,7 +131,7 @@ const value = await counter.methods.value().call();
 console.log(value);
 ----
 
-Make sure everything is running smoothly by running the script again and checking the printed value:
+스크립트를 다시 실행하고 출력 된 값을 확인하여 모든 것이 원활하게 실행되고 있는지 확인하십시오.
 
 [source,console]
 ----
@@ -139,18 +139,18 @@ $ node src/index.js
 11
 ----
 
-NOTE: If you restarted ganache between the xref:first.adoc[previous tutorial] and this one, the returned value will be zero, since all state will have been cleared.
+NOTE: xref:first.adoc[이전 튜토리얼]과 이 튜토리얼을 진행하는 사이에, 가나슈를 다시 시작한 경우 모든 상태가 지워 지므로, 리턴 된 값은 0이 됩니다.
 
-Cool! We can now actually interact with the contract by sending a transaction to it.
+멋져요! 이제 트랜잭션을 보내서 실제로 컨트랙트와 상호 작용할 수 있습니다.
 
 [[sending-a-transaction]]
-== Sending a transaction
+== 트랜잭션 보내기
 
-We will now https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#methods-mymethod-send[send a transaction] to `increase` the value of our Counter. Sending a transaction is not as straightforward as making a call: we need to specify who the sender will be, the gas limit, and the gas price we are going to use. To keep this example simple, we will use a hardcoded value for both gas and gas price, and send the transaction from the first available account on the node.
+이제 https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#methods-mymethod-send[트랜잭션을 보내서] 카운터의 값을 `증가` 시켜 보겠습니다. 트랜잭션을 보내는 것은, 누가보내는지 지정하고, 가스 한계치와 사용할 가스비용을 지정해야 하기때문에, `call` 만큼 간단하진 않습니다. 이 예제를 단순하게 유지하기위해, 가스 및 가스 가격 모두에 대해 하드 코딩 된 값을 사용하고 노드에서 사용 가능한 첫 번째 계정에서 거래를 보내겠습니다.
 
-NOTE: In a real-world application, you may want to https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#methods-mymethod-estimategas[estimate the gas] of your transactions, and check a https://ethgasstation.info/[gas price oracle] to know the optimal values to use on every transaction.
+NOTE: 실제 응용 프로그램에서는 https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#methods-mymethod-estimategas[거래 가스를 추정]  하고 https://ethgasstation.info/[가스 가격 오라클]을 확인하여 모든 거래에 사용할 최적의 값을 알고 싶을 수 있습니다.
 
-Let's increase our `Counter` value by 20 every time our snippet is run, and then use the code we had written before to display the updated value:
+스니펫이 실행될 때마다 `Counter` 값을 20 씩 늘린 다음, 이전에 작성한 코드를 사용하여 업데이트 된 값을 표시해 보겠습니다.
 
 [source,js]
 ----
@@ -166,7 +166,7 @@ const value = await counter.methods.value().call();
 console.log(value);
 ----
 
-We can now run the snippet, and check that the counter's value is increased every time we call it!
+이제 스니펫을 실행할 수 있으며 호출 할 때마다 카운터 값이 증가하는것을 확인할 수 있습니다!
 
 [source,console]
 ----
@@ -178,8 +178,8 @@ $ node src/index.js
 71
 ----
 
-You can also try interacting with the contract using `openzeppelin send-tx` and `openzeppelin call` as we did on the previous tutorial, and verify that it is the same instance we are working with from two different interfaces.
+이전 튜토리얼에서와 같이 `openzeppelin send-tx` 및 `openzeppelin call`을 사용하여 컨트렉트와 상호 작용을 시도 할 수 있으며, 서로 다른 두 인터페이스에서 작업중인 인스턴스와 동일한 인스턴스인지 확인할 수 있습니다.
 
-The snippet from this tutorial, while simple, is the basis for interacting with your smart contracts from your javascript applications. Remember you can use other libraries other than `web3.js` - or even other languages other than javascript! The OpenZeppelin SDK will take care of managing your contracts on the blockchain.
+이 학습서의 스니펫은 단순하지만 Javascript 애플리케이션에서 스마트 계약과 상호 작용하기위한 기본입니다. `web3.js`외에 다른 라이브러리를 이용 할 수도 있고, 자바스크립트가 아닌 다른 언어를 이용 할 수도 있습니다. OpenZeppelin SDK가 블록체인의 컨트랙트를 잘 관리 합니다.
 
-In the next tutorial, we will go into a more interesting smart contract application. We will work with more complex logic, connect with `@openzeppelin/contracts-ethereum-package` to create a token, and connect different contracts between themselves.
+다음 튜토리얼에서는, 스마트컨트랙트의 더 흥미로운 부분에 접근해 보겠습니다. 더 복잡한 로직을 실행해 보고, 토큰을 생성하기 위해 `@openzeppelin/contracts-ethereum-package`과 연동하고, 컨트랙트 간에 연결을 해 보겠습니다.
