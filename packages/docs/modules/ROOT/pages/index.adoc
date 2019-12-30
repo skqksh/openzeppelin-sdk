@@ -1,29 +1,29 @@
 [[openzeppelin-sdk]]
 = OpenZeppelin SDK
 
-The OpenZeppelin SDK is a platform to develop, deploy and operate smart contract projects on Ethereum and every other EVM and eWASM-powered blockchain.
+The OpenZeppelin SDK는 개발 플랫폼 으로, Ethereum 및 기타 모든 EVM 및 eWASM 기반 블록 체인에서 스마트컨트랙트 프로젝트를 배포하고 운영합니다.
 
-TIP: Looking for the documentation for version 2.4 or earlier? You can find it https://docs.zeppelinos.org/versions[here].
+TIP: 2.4버전 이하의 문서를 찾으시나요? https://docs.zeppelinos.org/versions[여기] 에서 확인하세요.
 
 [[features]]
-== Features
+== 특징
 
-* *Interactive commands*: Send transactions, query balances, and interact with your contracts directly from the command line.
-* *Upgrade your contracts*: You can develop your smart contracts iteratively, speeding up development locally, or squashing bugs in production.
-* *Link Ethereum Packages*: Use code from contracts already deployed to the blockchain directly on your project, saving gas on deployments and managing your dependencies securely.
-* *Build a (d)app*: Jumpstart your dapp by unpacking one of our starter kits, pre-configured with OpenZeppelin Contracts, OpenZeppelin SDK, React, and Infura.
+* *대화식 명령*: 명령어를 이용해 트랜잭션을 전송하고, 잔액을 조회하고, 컨트랙트와 상호 작용하세요.
+* *컨트랙트 업그레이드*: 스마트 컨트랙트를 반복적으로 개발하여, 로컬에서 개발 속도를 높이거나 프로덕션에서 버그를 제거 할 수 있습니다.
+* *이더리움 패키지 연결*: 프로젝트에서 블록체인에 이미 배포 된 컨트랙트의 코드를 사용하여, 배포시 가스를 절약하고 종속성을 안전하게 관리합니다.
+* *(d)app 빌드*: OpenZeppelin Contracts, OpenZeppelin SDK, React 및 Infura로 사전 구성된 스타터 키트 중 하나를 이용하여, dapp을 시작하십시오.
 
 [[getting-started]]
-== Getting Started
+== 시작하기
 
-Start by xref:first.adoc[deploying your first OpenZeppelin SDK project].
+xref:first.adoc[나의 첫번째 OpenZeppelin SDK 프로젝트] 부터 시작하세요.
 
 [[security]]
-== Security
+== 보안
 
-If you find a security issue, please contact us at security@openzeppelin.com. We give rewards for reported issues, according to impact and severity.
+보안 문제가 발견되면 security@openzeppelin.com으로 해주세요. 영향 및 심각도에 따라, 보고 된 문제에 대한 보상을 제공합니다.
 
 [[team]]
-== Team
+== 팀
 
-The OpenZeppelin SDK was started and is sponsored by https://openzeppelin.com/[the OpenZeppelin team].
+OpenZeppelin SDK는 https://openzeppelin.com/[OpenZeppelin 팀]에서 후원합니다
