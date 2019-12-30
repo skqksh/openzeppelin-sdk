@@ -1,18 +1,18 @@
 [[building-gsn-powered-dapp]]
-= Building a GSN powered (d)app from scratch
+= GSN 기반 (d)app 처음부터 빌드해보기
 
-In this tutorial, we will integrate several libraries from the SDK, as well as OpenZeppelin Contracts, to build a GSN-powered (d)app. The https://gsn.ethereum.org[GSN], or Gas Station Network, is a decentralized network of relayers that allow you to subsidize your users' transactions. This way, they do not need gas to use your (d)app. You can read more about the GSN https://docs.openzeppelin.com/contracts/2.x/gsn[here].
+이 튜토리얼에서는, OpenZeppelin Contracts뿐만아니라, SDK의 여러 라이브러리를 통합해서, GSN 기반의 (d)app 을 빌드 합니다. Gas Station Network(https://gsn.ethereum.org[GSN])은 탈중앙화된 릴레이 네트워크로써, 사용의 트랜잭션에 대한 보조금을 지급할 수 있게 합니다. 이 방법으로, 사용자들은 여러분의 앱을 이용하는데 가스가 필요없게 합니다. GSN에 대한 더 많은 정보는 https://docs.openzeppelin.com/contracts/2.x/gsn[여기] 서 확인하세요.
 
-We will use the `create-react-app` package to bootstrap a React application and use the `@openzeppelin/network` package to easily set up a web3 object with GSN support. Also, since the GSN is not available on your local ganache, we will use the `@openzeppelin/gsn-helpers` package to emulate it locally. We will use the `@openzeppelin/cli` to manage our contracts and extend from `@openzeppelin/contracts-ethereum-package` to add GSN capabilities to them. 
+`create-react-app` 패키지를 이용해서 리액트 어플리케이션을 구축하고, `@openzeppelin/network` 패키지를 이용하여 GSN을 지원하는 web3 객체를 쉽게 설정할 것입니다. 또한, GSN이 로컬 가나슈에서 동작하지 않기 때문에, `@openzeppelin/gsn-helpers` 패키지를 이용하여 로컬에 에뮬레이트 할 것입니다. `@openzeppelin/cli`로 우리의 컨트랙트를 관리하고, `@openzeppelin/contracts-ethereum-package` 를 이용하여 GSN 기능을 추가 할 것입니다.
 
-NOTE: It might feel like there are many moving pieces here, but each component has a well-defined role in building this application. That said, if you are new to the OpenZeppelin platform, it may help to look into the https://docs.openzeppelin.com/contracts/2.x/gsn[OpenZeppelin Contracts GSN guide] and xref:first.adoc[how to start your first SDK project] before you continue reading.
+NOTE: 여기에는 많은 움직이는 조각이있는 것처럼 느낄 수 있지만, 각 구성 요소는 이 응용 프로그램을 만드는 데 잘 정의 된 역할이 있습니다. 즉, 만약 OpenZeppelin 플랫폼을 처음 사용한다면, https://docs.openzeppelin.com/contracts/2.x/gsn[OpenZeppelin Contracts GSN guide] 와 xref:first.adoc[how to start your first SDK project]를 먼저 살펴보세요.
 
-We will create a super simple contract that just counts transactions sent to it from users but will tie it into the GSN so the users will not have to pay for the gas from those transactions. Let's get started!
+우리는 매우 간단한 컨트랙트를 생성하여, 사용자가 컨트랙트로 보낸 트랜잭션을 계산하도록 할것입니다. 그러나 GSN와 엮여있어서, 사용자는 해당 트랜잭션에 대한 가스비를 지불하지 않을것 입니다. 시작해 보겠습니다!
 
 [[environment-set-up]]
-== Setting up the environment
+== 환경설정
 
-We will begin by creating a new npm project and installing all dependencies.
+npm 프로젝트를 새로 만들고, 모든 의존성을 설치하겠습니다.
 
 [source,console]
 ----
@@ -22,15 +22,14 @@ npm install @openzeppelin/network
 npm install --save-dev @openzeppelin/gsn-helpers @openzeppelin/contracts-ethereum-package @openzeppelin/upgrades
 ----
 
-Make sure you have the https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/cli#readme[OpenZeppelin CLI installed], as well as https://www.trufflesuite.com/ganache[Ganache] for running a local network.
+로컬 네트워크 실행을 위한 https://www.trufflesuite.com/ganache[가나슈(Ganache)] 와 https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/cli#readme[OpenZeppelin CLI가 설치 되었는지] 확인해 주세요.
 
 [source,console]
 ----
 npm install --global @openzeppelin/cli ganache-cli
 ----
 
-
-Use the CLI to set up a new project and follow the prompts so we can write our first contract.
+CLI를 사용하여 새 프로젝트를 설정하고 프롬프트에 따라 첫번째 컨트랙트를 작성해 보겠습니다.
 
 [source,console]
 ----
@@ -39,9 +38,9 @@ openzeppelin init
 
 
 [[creating-our-contract]]
-== Creating our contract
+== 컨트랙트 생성하기
 
-We will write our vanilla `Counter` contract in the newly created `contracts` folder.
+새로운 `Counter` 컨트랙트를 새로 만들어진 `contracts`폴더안에 만들어 주세요.
 
 [source,solidity]
 ----
@@ -57,9 +56,9 @@ contract Counter {
 ----
 
 
-This is simple enough. Now, let's modify it to add GSN support. This requires extending from `GSNRecipient` contract and implementing the `acceptRelayedCall` method. This method must return whether we accept or reject to pay for a user transaction. For the sake of simplicity, we will be paying for all transactions sent to this contract.
+간단하죠? 이제, 이것을 GSN 지원을 추가하기 위해 수정해보겠습니다. `GSNRecipient` 컨트랙트를 상속 받아 `acceptRelayedCall` 함수를 구현해야 합니다. 이 함수는 우리가 사용자 트랜잭션에 대한 비용지불 승인 여부를 리턴해야 합니다. 단순화를 위해, 이 컨트랙트로 보내진 모든 트랜잭션 비용을 지불할 것입니다.
 
-NOTE: For most (d)apps, it is probably not a good idea to have such a generous policy since any malicious user can easily drain your contract from funds. Check out our https://docs.openzeppelin.com/[guide on GSN payment strategies] for different approaches to this problem.
+NOTE: 대부분의 앱에서는, 악의적인 사용자가 컨트랙트의 자금을 빼낼 수 있기때문에, 이런 관대한 정책은 좋지 않을 수 있습니다. https://docs.openzeppelin.com/[GSN 지불 정책 가이드]를 확인하여, 이 문제에 대한 다양한 접근법을 찾아 보세요.
 
 [source,solidity]
 ----
@@ -96,9 +95,9 @@ contract Counter is GSNRecipient {
 }
 ----
 
-Start ganache on a separate terminal by running `ganache-cli`. Then, create an instance of our new contract using the OpenZeppelin CLI with `oz create`, and follow the prompts, including saying yes to call a function to initialize the instance. Be sure to copy the address of your instance which is returned at the end of the process.
+새로운 터미널에서 `ganache-cli` 명령어로 가나슈를 실행하세요. 그리고,  OpenZeppelin CLI의 `oz create` 를 이용해 새 컨트랙트에의 인스턴스를 생성하며, 프롬프트를 따르고, 인스턴스를 초기화 하는 함수를 호출에는 yes 를 실행하세요. 프로세스 마지막에 리턴하는 인스턴스 주소는 확실히 복사해 둬 주세요.
 
-NOTE: It is important that you remember to call the `initialize()` function when creating the contract, as this will be sure to get your contract ready to be used in the GSN.
+NOTE: 컨트랙트 생성시 `initialize()` 함수를 호출하는것은 중요합니다. 그래야 컨트랙트가 GSN에서 이용할 수 있도록 준비 되기 때문입니다.
 
 
 [source,console]
@@ -113,14 +112,14 @@ All contracts are up to date
 ✓ Instance created at 0x7F73086E24ce5834E62075dEAB2b8F10865FFF9B
 ----
 
-Great! Now, if we deployed this contract to mainnet or the rinkeby testnet, we would almost be ready to start sending gasless transactions to it since the GSN is set up on both of those networks. However, since we are on a local ganache, we need to set it up ourselves.
+훌륭합니다! 만약에 우리가 이 컨트랙트를 메인넷이나 링크비 테스트넷에 배포했었다면, GSN이 각 네트워크에 설정되었기때문에, 가스비없는 트랜잭션 전송을 거의 실행할 수 있는 상태였을 것입니다. 하지만, 우린 로컬 가나슈를 사용중이기에, 직접 GSN을 설정해야 합니다. 
 
 [[deploying-local-gsn]]
-== Deploying a local GSN for development
+== 개발을 위해 로컬 GSN을 배포하기
 
-The GSN is composed of a central `RelayHub` contract that coordinates all relayed transactions, as well as multiple decentralized relayers. The relayers are processes that receive requests to relay a transaction via an HTTP interface and send them to the network via the `RelayHub`.
+GSN은 여러 탈중앙화된 중계기 뿐만아니라, 모든 중계 트랜잭션을 조정하는 중앙 'RelayHub' 컨트랙트로 구성됩니다. 중계기는 HTTP 인터페이스를 통해 트랜잭션을 중계하라는 요청을 받고`RelayHub`를 통해 네트워크로 보내는 프로세스입니다.
 
-Having ganache already running, you can start a new relayer in a new terminal using the following command from `@openzeppelin/gsn-helpers`:
+가나슈가 실행되는 상태에서, `@openzeppelin/gsn-helpers` 명령어를 이용하여 새 터미널 창에서 새로운 중계기를 실행할 수 있습니다.
 
 [source,console]
 ----
@@ -135,36 +134,34 @@ RelayHttpServer starting. version: 0.4.0
 Relay funded. Balance: 4999305160000000000
 ----
 
-NOTE: Under the hood, this command takes care of several steps to have a local relayer up and running. First, it will download a relayer binary for your platform and start it. It will then deploy the `RelayHub` contract to your local ganache, registering the relayer on the hub, and funding it so it can relay transactions. You can run these steps individually by using other `oz-gsn commands` or even https://github.com/OpenZeppelin/openzeppelin-gsn-helpers[directly from your code].
+NOTE: 이면에, 이 명령어는 로컬 중계기를 올리고 실행하는과정에 여러단계를 거칩니다. 첫째로, 플랫폼에 대한 중계기 바이너리를 다운로드하여 시작합니다. 그리고, `RelayHub` 컨트랙트를 로컬 가나슈에 배포할 것이며, 허브에 중계기를 등록한뒤, 자금을 조달하여 트랜잭션이 중계될 수 있도록 할것입니다. `oz-gsn commands` 명령어를 이용하여 이 단계를 직접 실행하거나, https://github.com/OpenZeppelin/openzeppelin-gsn-helpers[코드에서 직접] 해볼 수 있습니다.
 
-The last step will be to _fund_ our `Counter` contract. GSN relayers require recipient contracts to have funds since they will then charge the cost of the relayed transaction (plus a fee!) to it. We will again use the `oz-gsn` set of commands to do this. Make sure to replace the recipient address with the address of your `Counter` contract instance.
+마지막은 `Counter` 컨트랙트에 _자금조달_ 하는 단계 입니다. GSN 중계기는 수령인 계약에 자금이 있어야하는데, 중계 거래 비용 (수수료 추가)을 청구하기 때문입니다. 우리는 다시`oz-gsn` 명령 세트를 사용하여 이를 수행 할 것입니다. 수신자 주소를 `카운터` 컨트랙트의 인스턴스의 주소로 바꿔 주세요.
 
 [source,console]
 ----
 $ npx oz-gsn fund-recipient --recipient 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 ----
 
-Cool! Now that we have our GSN-powered contract and a local GSN to try it out, let's build a small (d)app.
+멋져요! 이제 GSN 기반 계약과 로컬 GSN을 사용하여 작은 디앱을 만들어 보겠습니다.
 
 [[creating-the-dapp]]
-== Creating the dapp
+== 디앱 만들기
 
-We will create our (d)app using the `create-react-app` package, which bootstraps a simple client-side application using React.
+우리는 React를 사용하여 간단한 클라이언트 애플리케이션을 생성하는`create-react-app` 패키지를 사용하여 디앱을 만들 것입니다
 
 [source,console]
 ----
 npx create-react-app client
 ----
 
-First, create a symlink so we can access our compiled contract `.json` files. From inside the `client/src` directory, run:
+먼저 심볼릭 링크를 만들어 컴파일 된 계약`.json` 파일에 액세스 할 수 있습니다. `client / src` 디렉토리에서 다음을 실행하십시오
 [source,console]
 ----
 ln -ns ../../build
 ----
 
-This will allow our front end to reach our contract artifacts.
-
-Then, replace `client/src/App.js` file, with the following code. This will use `@openzeppelin/network` to create a new provider connected to the local network. It will use a key generated on the spot to sign all transactions on behalf of the user and will use the GSN to relay them to the network. This allows your users to start interacting with your (d)app right away, even if they do not have MetaMask installed, an Ethereum account, or any ETH at all.
+이를 통해 프론트 엔드가 컨트랙트 아티팩트에 도달 할 수 있습니다. 이것은 `@openzeppelin/network`를 사용하여 로컬 네트워크에 연결된 새로운 공급자를 만듭니다. 즉석에서 생성 된 키를 사용하여 사용자를 대신하여 모든 거래에 서명하고, GSN을 사용하여 거래를 네트워크에 중계합니다. 이를 통해 MetaMask, Ethereum 계정 또는 ETH가 설치되어 있지 않아도 사용자가 디앱과 즉시 상호 작용할 수 있습니다.
 
 [source,javascript]
 ----
@@ -246,16 +243,16 @@ export default App;
 ----
 
 
-NOTE: You can pass a `dev: true` flag to the `gsn` options when setting up the provider. This will use the https://github.com/OpenZeppelin/openzeppelin-gsn-provider/[GSNDevProvider] instead of the regular GSN provider. This is a provider set up specifically for testing or development, and it _does not require a relayer to be running_ to work. This can make development easier, but it will feel less like the actual GSN experience. If you want to use an actual relayer, you can run `npx oz-gsn run-relayer` locally (see the https://github.com/OpenZeppelin/openzeppelin-gsn-helpers#running-the-relayer-binary[OpenZeppelin GSN helpers] for more info).
+NOTE: 공급자를 설정할 때`dev : true` 플래그를`gsn` 옵션에 전달할 수 있습니다. 이것은 일반 GSN 공급자 대신에 https://github.com/OpenZeppelin/openzeppelin-gsn-provider/[GSNDevProvider] 을 사용하게 합니다. 이것은 테스트 또는 개발을 위해 특별히 설정된 공급자이며, _작동하기 위해 중계기를 실행할 필요가 없습니다._ T이를 통해 개발이 쉬워 지지만 실제 GSN 경험과 같은 느낌이 들지 않습니다. 실제 중계기를 사용하려면 `npx oz-gsn run-relayer`를 로컬로 실행할 수 있습니다 (자세한 내용은 https://github.com/OpenZeppelin/openzeppelin-gsn-helpers#running-the-relayer-binary[OpenZeppelin GSN] 도우미 참조).
 
-Great! We can now fire up our application running `npm start` from within the `client` folder. Remember to keep both your ganache and relayer up and running. You should be able to send transactions to your `Counter` contract without having to use MetaMask or have any ETH at all!
+좋습니다! `client` 폴더 내에서`npm start`를 실행하는 응용 프로그램을 시작할 수 있습니다. 가나슈와 중계기를 모두 작동시키고 유지해 주세요. MetaMask를 사용하거나 ETH를 전혀 보유하지 않아도 '카운터' 컨트랙트로 트랜잭션을 보낼 수 있어야합니다!
 
 [[moving-to-testnet]]
-== Moving to a testnet
+== 테스트 넷으로 이동
 
-It is not too impressive sending a local transaction in your ganache network, where you already have a bunch of fully-funded accounts. To witness the GSN at its full potential, let's move our application to the Rinkeby testnet. If you later want to go onto mainnet, the instructions are the same.
+가나슈 네트워크에서 로컬 거래를 보내는 것은, 충분히 자금이 계정에 있기 때문에 그다지 인상적이지는 않습니다. GSN의 잠재력을 최대한 발휘하려면, 우리의 어플리케이션을 테스트넷으로 이동시켜보겠습니다. 나중에 메인넷으로 이동하고 싶은경우, 방법은 동일합니다.
 
-Let's start by deploying our `Counter` contract to Rinkeby. You will need an account with some Rinkeby Ether for this, which you will have to register in your `network.js` file. Take a look at xref:public-deploy.adoc[deploying to a public network] guide for more information.
+우리의 `Counter` 컨트랙트를 링크비에 배포하는것 부터 해보겠습니다. 링크비의 이더를 가진 계정이 필요하며, `network.js` 파일에 이 계정이 등록되어있어야 합니다. xref:public-deploy.adoc[공공 네트워크에 배포하기] 가이드를 참고하여 더 많은 정보를 확인하세요.
 
 [source,console]
 ----
@@ -272,7 +269,7 @@ $ openzeppelin create
 ----
 
 
-The next step will be to instruct our (d)app to connect to a Rinkeby node instead of to the local network. Change the `PROVIDER_URL` in your `App.js` to do this using, for instance, an Infura Rinkeby endpoint. At this point, you will also want to pass in a config object as we will be using a real GSN provider rather than our developer environment, and our config options give us more control over things such as the gas price we are willing to pay. For production (d)apps, you will want to configure this to your requirements. 
+다음단계는 우리의 디앱을 로컬네트워크 대신에 링크비 네트워크에 연결하는 것 입니다.  예를 들어 Infura Rinkeby 엔드 포인트를 사용하여이를 수행하려면`App.js`에서`PROVIDER_URL`을 변경하십시오. 여기서, 또한 개발자 환경이 아닌 실제 GSN 공급자를 사용하므로, 구성 개체를 전달하려고합니다. 구성 옵션을 사용하면 지불하려는 가스 가격과 같은 항목을보다 효과적으로 제어 할 수 있습니다. 프로덕션 디앱의 경우 이를 요구 사항에 맞게 구성하려고합니다.
 
 [source,javascript]
 ----
@@ -285,17 +282,17 @@ const context = useWeb3Network('https://rinkeby.infura.io/v3/' + INFURA_API_TOKE
 });
 ----
  
-Redeploy using the cli command `oz create`, selecting `Rinkeby` as the network, and copy the address returned at the end (You will need it later to fund your contract!).
+cli 명령`oz create`를 사용하여 재배포하고, 네트워크로`Rinkeby`를 선택하고, 마지막에 리턴 된 주소를 복사하십시오 (나중에 컨트랙트에 자금을 조달하기 위해 필요합니다).
 
-We are almost there! If you try to use your (d)app now, you will notice that you are not able to send any transactions. This is because your `Counter` contract has not been funded on this network yet. Instead of using the `oz-gsn fund-recipient` command we used earlier, we will now use the https://gsn.openzeppelin.com[online gsn-tool] by pasting in the address of your instance. To do this, the web interface requires that you use MetaMask on the Rinkeby Network, which will allow you to deposit funds into your contract.
+거의 다 왔습니다! 디앱을 사용해 보면, 어떤 트랜잭션도 보낼수 없다는것을 알수 있을 것 입니다. 왜냐하면 `Counter` 컨트랙트는 아직 자금조달이 되지 않았기 때문입니다. 앞에서 사용한 `oz-gsn fund-recipient`명령을 사용하는 대신 이제 인스턴스 주소를 붙여 https://gsn.openzeppelin.com[온라인 gsn-tool]을 사용합니다. 이렇게하려면 웹 인터페이스에서 Rinkeby Network에서 MetaMask를 사용해야합니다. 그러면 컨트랙트에 자금을 입금 할 수 있습니다.
 
 image::GSNDappTool.png[OpenZeppelin GSN Dapp Tool,500]
 
-That's it! We can now start sending transactions to our `Counter` contract on the Rinkeby network from our browser without even having MetaMask installed.
+끝입니다! 이제 MetaMask를 설치하지 않아도, 브라우저에서 Rinkeby 네트워크의 카운터 컨트랙트로 트랜잭션을 보낼 수 있습니다.
 
 [[wrapping-up]]
-== Wrapping up
+== 마무리
 
-In this example, we have built a GSN-powered (d)app from scratch combining several OpenZeppelin libraries. First, we extended from the OpenZeppelin Contracts to have our contract act as GSN recipients. Then, we used the OpenZeppelin CLI to compile and deploy our contract on a local network. After that, we set up a local GSN (relayer included!) using the `oz-gsn run-relayer` command from `@openzeppelin/gsn-helpers` and funded our recipient with `oz-gsn fund-recipient`. Once we had our contract set up in our local network, we relied on `create-react-app` to set up a new client-side app and used `@openzeppelin/network` to easily get a web3 GSN provider to start interacting with our contract.
+이 예제를 통해, 여러 OpenZeppelin 라이브러리를 결합하여 처음부터 GSN 기반 디앱을 구축했습니다. 첫번째로, OpenZeppelin Contracts에서 컨트랙트를 을 GSN 수령인으로 확장했습니다. 그런 다음 OpenZeppelin CLI를 사용하여 컨트랙트를 로컬 네트워크에 컴파일하고 배포했습니다. 그런 다음, `@openzeppelin/gsn-helpers`의`oz-gsn run-relayer` 명령을 사용하여 로컬 GSN (relayer 포함!)을 설정하고 수신자에게 `oz-gsn fund-recipient'를 지원했습니다. 컨트랙트를 로컬 네트워크에 설정한후, `create-react-app` 을 이용하여 클라이언트사이드 앱을 만들고, `@openzeppelin/network`를 이용하여 web3 GSN 공급자를 쉽계 가져와 우리가 만든 컨트랙트와 상호작용하도록 했습니다.
 
-If you want to fast-forward to start building your GSN-powered (d)app right away, make sure to check out our https://docs.openzeppelin.com/starter-kits/2.3/[GSN Starter Kit], which provides you with a ready-to-use project template that combines all of what we have seen on this guide!
+GSN 기반 디앱을 바로 빌드하기 시작하려면 https://docs.openzeppelin.com/starter-kits/2.3/[GSN 스타터 키트]를 확인하십시오. GSN 스타터 키트는, 이 안내서에서 본 모든 것을 결합한 즉시 사용 가능한 프로젝트 템플릿을 제공합니다!
