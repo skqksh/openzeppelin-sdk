@@ -1,18 +1,18 @@
 [[writing-upgradeable-contracts]]
-= Writing upgradeable contracts
+= 업그레이드 가능한 컨트랙트 작성하기
 
-When working with upgradeable contracts in the OpenZeppelin SDK, there are a few minor caveats to keep in mind when writing your Solidity code. It's worth mentioning that these restrictions have their roots in how the Ethereum VM works, and apply to all projects that work with upgradeable contracts, not just the OpenZeppelin SDK.
+OpenZeppelin SDK에서 업그레이드 가능한 컨트랙트를 작업 할 때, Solidity 코드 작성에서 명심해야 할 몇 가지주의 사항이 있습니다. 이러한 제한 사항은 Ethereum VM의 작동 방식에 뿌리를두고 있으며, OpenZeppelin SDK뿐만 아니라 업그레이드 가능한 컨트랙트로 작동하는 모든 프로젝트에 적용됩니다.
 
 [[initializers]]
-== Initializers
+== 이니셜라이저
 
-You can use your Solidity contracts in the OpenZeppelin SDK without any modifications, except for their _constructors_. Due to a requirement of the proxy-based upgradeability system, no constructors can be used in upgradeable contracts. You can read in-depth about the reasons behind this restriction xref:pattern.adoc#the-constructor-caveat[in the OpenZeppelin SDK Upgrades Pattern page].
+_constructors_를 제외하고는, OpenZeppelin SDK에서 Solidity 컨트랙트를 수정하지 않고 사용할 수 있습니다. 프록시 기반 업그레이드 시스템의 요구 사항으로 인해 업그레이드 가능한 컨트랙트에는 생성자를 사용할 수 없습니다. xref:pattern.adoc#the-constructor-caveat[OpenZeppelin SDK 업그레이드 패턴 페이지]에서 이 제한의 원인에 대해 자세히 읽을 수 있습니다.
 
-This means that, when using a contract within the OpenZeppelin SDK, you need to change its constructor into a regular function, typically named `initialize`, where you run all the setup logic:
+즉, OpenZeppelin SDK 내에서 컨트랙트를 사용할 때 생성자를 일반적으로 `initialize`라는 일반 함수로 변경해야합니다. 여기서 모든 설정 로직을 실행합니다.
 
 [source,solidity]
 ----
-// NOTE: Do not use this code snippet, it's incomplete and has a critical vulnerability!
+// NOTE: 이 코드 스니펫을 사용하지 마십시오. 불완전하며 치명적인 취약점이 있습니다!
 
 contract MyContract {
   uint256 public x;
@@ -23,7 +23,7 @@ contract MyContract {
 }
 ----
 
-However, while Solidity ensures that a `constructor` is called only once in the lifetime of a contract, a regular function can be called many times. To prevent a contract from being _initialized_ multiple times, you need to add a check to ensure the `initialize` function is called only once:
+그러나 Solidity는 컨트랙트에서 `생성자`가 한 번만 호출되도록하지만, 일반 함수는 여러 번 호출 할 수 있습니다. 계약이 여러 번 _initialized_되지 않게하려면 `initialize` 함수가 한 번만 호출되는지 확인해야합니다.
 
 [source,solidity]
 ----
@@ -39,7 +39,7 @@ contract MyContract {
 }
 ----
 
-Since this pattern is very common when writing upgradeable contracts, the OpenZeppelin SDK provides an `Initializable` base contract that has an `initializer` modifier that takes care of this:
+이 패턴은 업그레이드 가능한 계약을 작성할 때 매우 일반적이므로 OpenZeppelin SDK는 이를 처리하는 `initializer`수정자를 가진 기본 컨트랙트 `Initializable`을 제공합니다.
 
 [source,solidity]
 ----
@@ -54,7 +54,7 @@ contract MyContract is Initializable {
 }
 ----
 
-Another difference between a `constructor` and a regular function is that Solidity takes care of automatically invoking the constructors of all ancestors of a contract. When writing an initializer, you need to take special care to manually call the initializers of all parent contracts:
+`constructor`와 일반 함수의 또 다른 차이점은 Solidity가 계약의 모든 조상 컨트랙트의 생성자를 자동으로 호출한다는 점입니다. 이니셜라이저를 작성할 때 모든 상위 계약의 이니셜라이저를 수동으로 호출하도록 특별한주의를 기울여야합니다.
 
 [source,solidity]
 ----
@@ -79,9 +79,9 @@ contract MyContract is BaseContract {
 ----
 
 [[use-upgradeable-packages]]
-=== Use upgradeable packages
+=== '업그레이드 가능' 패키지 사용
 
-Keep in mind that this restriction affects not only your contracts, but also the contracts you import from a library. For instance, if you use the https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v2.0.0/contracts/token/ERC20/ERC20Detailed.sol[`ERC20Detailed` token implementation] from OpenZeppelin, the contract initializes the token's name, symbol and decimals in its constructor:
+이 제한 사항은 직접 만든 컨트랙트 뿐만 아니라 라이브러리에서 가져온 컨트랙트에도 영향을 미칩니다. 예를 들어, OpenZeppelin의 https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v2.0.0/contracts/token/ERC20/ERC20Detailed.sol[`ERC20Detailed 토큰` 구현]을 사용하는 경우, 계약서에서 생성자의 토큰 이름, 기호 및 소수를 초기화합니다.
 
 [source,solidity]
 ----
@@ -98,7 +98,7 @@ Contract ERC20Detailed is IERC20 {
 }
 ----
 
-This means that you should not be using these contracts in your OpenZeppelin SDK project. Instead, make sure to use `@openzeppelin/contracts-ethereum-package`, which is an official fork of `openzeppelin-contracts` that has been modified to use initializers instead of constructors. For instance, an ERC20 implementation provided by `@openzeppelin/contracts-ethereum-package` is the https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package/blob/v2.0.2/contracts/token/ERC20/ERC20Mintable.sol[`ERC20Mintable`]:
+이는 OpenZeppelin SDK 프로젝트에서 이러한 컨트랙트를 사용하지 않아야 함을 의미합니다. 대신, 생성자 대신 이니셜라이저를 사용하도록 수정 된 `openzeppelin-contracts`의 공식 포크 인`@ openzeppelin / contracts-ethereum-package`를 사용해야합니다. 예를 들어, `@openzeppelin/contracts-ethereum-package`에서 제공하는 ERC20 구현은 https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package/blob/v2.0.2/contracts/token/ERC20/ERC20Mintable.sol[`ERC20Mintable`]입니다.
 
 [source,solidity]
 ----
@@ -110,12 +110,12 @@ contract ERC20Mintable is Initializable, ERC20, MinterRole {
 }
 ----
 
-Whether it is OpenZeppelin Contracts or another Ethereum Package, always make sure that the package is set up to handle upgradeable contracts.
+OpenZeppelin Contracts이든 다른 Ethereum Package이든 관계없이 항상 패키지가 업그레이드 가능한 계약을 처리하도록 설정되어 있는지 확인하십시오.
 
 [[avoid-initial-values-in-field-declarations]]
-=== Avoid initial values in field declarations
+=== 필드 선언에서 초기 값을 피하세요
 
-Solidity allows defining initial values for fields when declaring them in a contract.
+솔리디티는 컨트랙트에서 필드를 선언 할 때 필드의 초기 값을 정의 할 수 있게합니다.
 
 [source,solidity]
 ----
@@ -124,7 +124,7 @@ contract MyContract {
 }
 ----
 
-This is equivalent to setting these values in the constructor, and as such, will not work for upgradeable contracts. Make sure that all initial values are set in an initializer function as shown below; otherwise, any upgradeable instances will not have these fields set.
+이는 생성자에서 이러한 값을 설정하는 것과 같으므로, 업그레이드 가능한 컨트랙트에서는 작동하지 않습니다. 모든 초기 값이 아래와 같이 이니셜라이저 함수안에 설정되어 있는지 확인 해 주세요. 그렇지 않으면 업그레이드 가능한 인스턴스에는 이러한 필드가 설정되지 않습니다.
 
 [source,solidity]
 ----
@@ -136,7 +136,7 @@ contract MyContract is Initializable {
 }
 ----
 
-Note that it still is fine to set constants here, because the compiler https://solidity.readthedocs.io/en/latest/contracts.html#constant-state-variables[does not reserve a storage slot for these variables], and every occurrence is replaced by the respective constant expression. So the following still works in the OpenZeppelin SDK:
+컴파일러는 이러한 https://solidity.readthedocs.io/en/latest/contracts.html#constant-state-variables[변수에 대한 스토리지 슬롯을 예약하지 않으며], 모든 발생이 각각의 상수 식으로 대체되기 때문에, 상수(constant)는 여전히 여기서 설정하는 것이 좋습니다. 따라서 OpenZeppelin SDK에서는 다음이 여전히 작동합니다.
 
 [source,solidity]
 ----
@@ -146,11 +146,11 @@ contract MyContract {
 ----
 
 [[creating-new-instances-from-your-contract-code]]
-== Creating new instances from your contract code
+== 컨트랙트 코드에서 새 인스턴스 작성
 
-When creating a new instance of a contract from your contract's code, these creations are handled directly by Solidity and not by the OpenZeppelin SDK, which means that *these contracts will not be upgradeable*.
+컨트랙트 코드에서 컨트랙트의 새 인스턴스를 생성 할 때, 이러한 생성은 OpenZeppelin SDK가 아닌 Solidity에 의해 직접 처리되므로 *계약을 업그레이드 할 수 없습니다*.
 
-For instance, in the following example, even if `MyContract` is upgradeable (if created via `openzeppelin create MyContract`), the `token` contract created is not:
+예를 들어, 다음 예 에서 `MyContract`가 업그레이드 가능하더라도 (`openzeppelin create MyContract`을 통해 작성된 경우) 작성된 `토큰` 컨트랙트는 그렇지 않습니다.
 
 [source,solidity]
 ----
@@ -167,7 +167,7 @@ contract MyContract is Initializable {
 }
 ----
 
-The easiest way around this issue is to avoid creating contracts on your own altogether: instead of creating a contract in an `initialize` function, simply accept an instance of that contract as a parameter, and inject it after creating it from the OpenZeppelin SDK:
+이 문제를 해결하는 가장 쉬운 방법은 직접 컨트랙트를 포함하지 않는 것입니다. `초기화` 함수에서 컨트랙트를 작성하는 대신 해당 컨트랙트의 인스턴스를 매개 변수로 승인하고 OpenZeppelin SDK에서 컨트랙트를 작성한 후 삽입하세요.
 
 [source,solidity]
 ----
@@ -189,7 +189,7 @@ $ TOKEN=$(openzeppelin create TokenContract)
 $ openzeppelin create MyContract --init --args $TOKEN
 ----
 
-An advanced alternative, if you need to create upgradeable contracts on the fly, is to keep an instance of your OpenZeppelin SDK `App` in your contracts. The xref:api::upgrades.adoc#App[`App`] is a contract that acts as the entrypoint for your OpenZeppelin SDK project, which has references to your logic implementations, and can create new contract instances:
+더 나은 대안으로는, 업그레이드 가능한 계약을 즉시 작성해야하는 경우, 계약에 OpenZeppelin SDK `App`의 인스턴스를 가지는 것입니다. The xref:api::upgrades.adoc#App[`App`]은 OpenZeppelin SDK 프로젝트의 시작점 역할을하는 계약으로, 논리 구현에 대한 참조가 있으며 새로운 계약 인스턴스를 만들 수 있습니다.
 
 [source,solidity]
 ----
@@ -210,22 +210,22 @@ contract MyContract is Initializable {
 ----
 
 [[potentially-unsafe-operations]]
-== Potentially unsafe operations
+== 잠재적으로 안전하지 않은 작업
 
-When working with upgradeable smart contracts, you will always interact with the contract instance, and never with the underlying logic contract. However, nothing prevents a malicious actor from sending transactions to the logic contract directly. This does not pose a threat, since any changes to the state of the logic contracts do not affect your contract instances, as the storage of the logic contracts is never used in your project.
+업그레이드 가능한 스마트 컨트랙트로 작업 할 때는, 항상 컨트랙트 인스턴스와 상호 작용하며, 기본 논리 컨트랙트와는 상호 작용하지 않습니다. 그러나 악의적 인 행위자가 트랜잭션을 논리 컨트랙트에 직접 보내는 것을 막는 것은 없습니다. 논리 컨트랙트의 저장은 프로젝트에서 사용되지 않으므로, 논리 컨트랙트의 상태를 변경해도 컨트랙트 인스턴스에 영향을 미치지 않으므로, 이는 위협이되지 않습니다.
 
-There is, however, an exception. If the direct call to the logic contract triggers a `selfdestruct` operation, then the logic contract will be destroyed, and all your contract instances will end up delegating all calls to an address without any code. This would effectively break all contract instances in your project.
+그러나 예외는 있습니다. 논리 컨트랙트에 대한 직접 호출이 `자체 파괴`작업을 트리거하면, 논리 컨트랙트가 소멸되고 모든 컨트랙트 인스턴스가 코드없이 주소로 모든 호출을 위임하게됩니다. 이렇게하면 프로젝트의 모든 컨트랙트 인스턴스가 효과적으로 중단됩니다.
 
-A similar effect can be achieved if the logic contract contains a `delegatecall` operation. If the contract can be made to `delegatecall` into a malicious contract that contains a `selfdestruct`, then the calling contract will be destroyed.
+논리 컨트랙트에 `delegatecall`작업이 포함되어 있으면 비슷한 효과를 얻을 수 있습니다. `selfdestruct`를 포함하는 악의적인 컨트랙트로 `delegatecall` 컨트랙트를 실행 할 수 있으면, 호출된 컨트랙트는 파기됩니다.
 
-As such, it is strongly recommended to avoid any usage of either `selfdestruct` or `delegatecall` in your contracts. If you need to include them, make absolutely sure they cannot be called by an attacker on an uninitialized logic contract.
+따라서 컨트랙트에서 `selfdestruct` 또는`delegatecall`을 사용하지 않는 것이 좋습니다. 이를 포함해야하는 경우 초기화되지 않은 논리 컨트랙트에서 공격자가 호출 할 수 없도록하십시오.
 
 [[modifying-your-contracts]]
-== Modifying your contracts
+== 컨트랙트 수정
 
-When writing new versions of your contracts, either due to new features or bugfixing, there is an additional restriction to observe: you cannot change the order in which the contract state variables are declared, nor their type. You can read more about the reasons behind this restriction xref:pattern.adoc[in the pattern section].
+새로운 기능이나 버그 수정으로 인해 컨트랙트의 새 버전을 작성할 때, 준수해야 할 추가 제한 사항이 있습니다. 컨트랙트 상태 변수의 선언 된 순서 나 유형을 변경할 수 없습니다. xref:pattern.adoc[패턴 섹션에서]이 제한의 원인에 대한 자세한 내용을 읽을 수 있습니다.
 
-This means that if you have an initial contract that looks like this:
+즉, 다음과 같은 초기 컨트랙트가있는 경우 
 
 [source,solidity]
 ----
@@ -235,7 +235,7 @@ contract MyContract {
 }
 ----
 
-Then you cannot change the type of a variable:
+이후엔, 변수 유형을 변경할 수 없으며, 
 
 [source,solidity]
 ----
@@ -245,7 +245,7 @@ contract MyContract {
 }
 ----
 
-Or change the order in which they are declared:
+순서 역시 변경할 수 없고,
 
 [source,solidity]
 ----
@@ -255,7 +255,7 @@ contract MyContract {
 }
 ----
 
-Or introduce a new variable before existing ones:
+기존에 존재하는 변수 이전에, 새 변수를 추가할 수 없고,
 
 [source,solidity]
 ----
@@ -266,7 +266,7 @@ contract MyContract {
 }
 ----
 
-Or remove an existing variable:
+기존 존재하는 변수를 제거할 수 없습니다.
 
 [source,solidity]
 ----
@@ -275,7 +275,7 @@ contract MyContract {
 }
 ----
 
-If you need to introduce a new variable, make sure you always do so at the end:
+새로운 변수를 추가하고자 하는경우엔, 항상 기존 변수 마지막에 추가되어야 합니다.
 
 [source,solidity]
 ----
@@ -286,7 +286,7 @@ contract MyContract {
 }
 ----
 
-Keep in mind that if you rename a variable, then it will keep the same value as before after upgrading. This may be the desired behaviour if the new variable is semantically the same as the old one:
+변수 이름을 바꾸면 업그레이드 후와 동일한 값을 유지한다는 점에 유의하십시오. 새 변수가 의미 적으로 이전 변수와 동일한 경우 이는 바람직한 동작 일 수 있습니다.
 
 [source,solidity]
 ----
@@ -296,7 +296,7 @@ contract MyContract {
 }
 ----
 
-And if you remove a variable from the end of the contract, note that the storage will not be cleared. A subsequent update that adds a new variable will cause that variable to read the leftover value from the deleted one.
+컨트랙트의 마지막에있는 변수를 제거해도, 스토리지에서는 지워지지 않습니다. 새 변수를 추가하는 후속 업데이트는 해당 변수가 삭제 된 값에서 남은 값을 읽도록합니다.
 
 [source,solidity]
 ----
@@ -312,7 +312,7 @@ contract MyContract {
 }
 ----
 
-Note that you may also be inadvertently changing the storage variables of your contract by changing its parent contracts. For instance, if you have the following contracts:
+부모 컨트랙트를 을 변경하여 컨트랙트의 저장 변수를 실수로 변경하는 경우도 있습니다. 예를 들어, 다음과 같은 컨트랙트가있는 경우
 
 [source,solidity]
 ----
@@ -327,14 +327,14 @@ contract B {
 contract MyContract is A, B { }
 ----
 
-Then modifying `MyContract` by swapping the order in which the base contracts are declared, or introducing new base contracts, will change how the variables are actually stored:
+그런 다음 기본 컨트랙트가 선언 된 순서를 바꾸거나 새 기본 컨트랙트를 도입하여 `MyContract`를 수정하면, 변수가 실제로 저장되는 방식이 변경됩니다.
 
 [source,solidity]
 ----
 contract MyContract is B, A { }
 ----
 
-You also cannot add new variables to base contracts, if the child has any variables of its own. Given the following scenario:
+하위에 자체 변수가있는 경우 기본 컨트랙트에 새 변수를 추가 할 수 없습니다. 다음과 같은 시나리오가 있습니다.
 
 [source,solidity]
 ----
@@ -347,7 +347,7 @@ contract Child is Base {
 }
 ----
 
-If `Base` is modified to add an extra variable:
+변수를 추가하기 위해`Base`가 수정 된 경우
 
 [source,solidity]
 ----
@@ -357,6 +357,6 @@ contract Base {
 }
 ----
 
-Then the variable `base2` would be assigned the slot that `child` had in the previous version. A workaround for this is to declare unused variables on base contracts that you may want to extend in the future, as a means of "reserving" those slots. Note that this trick does not involve increased gas usage.
+그런 다음 변수`base2`에는 이전 버전에서`child`가 있던 슬롯이 할당됩니다. 이에 대한 임시 해결책은, 해당 슬롯을 "예약"하는 수단으로 향후 확장하려는 기본 컨트랙트에서 사용되지 않는 변수를 선언하는 것입니다. 이 트릭에는 가스 사용량이 증가하지 않습니다.
 
-CAUTION: Violating any of these storage layout restrictions will cause the upgraded version of the contract to have its storage values mixed up, and can lead to critical errors in your application.
+CAUTION: 이러한 스토리지 레이아웃 제한을 위반하면 업그레이드 된 계약 버전의 스토리지 값이 혼합되어 애플리케이션에 심각한 오류가 발생할 수 있습니다.
